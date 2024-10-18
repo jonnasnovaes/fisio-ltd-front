@@ -23,7 +23,7 @@ export class PacientesComponent implements OnInit {
   }
 
   visualizarPaciente(id: number) {
-    this.router.navigate(['novopaciente', id]); // Navega para a tela de edição passando o ID do paciente
+    this.router.navigate(['editar-paciente', id]); // Navega para a tela de edição passando o ID do paciente
   }
 
   // Método para obter pacientes

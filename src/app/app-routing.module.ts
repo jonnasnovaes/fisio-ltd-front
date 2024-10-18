@@ -8,11 +8,11 @@ const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'pacientes', component: PacientesComponent },
   { path: 'novopaciente', component: NovopacienteComponent }, // Para cadastro de novo paciente
-  { path: 'novopaciente/:id', component: NovopacienteComponent } // Para edição de paciente existente
+  { path: 'editar-paciente/:id', component: NovopacienteComponent }, // Alterando para editar paciente existente
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}
