@@ -11,9 +11,16 @@
   position: relative; /* Define um contêiner relativo */
 }
 
+.logoFisio {
+  width: 59px;
+  height: auto;
+  position: absolute; /* Remove o elemento do fluxo normal */
+  top: -23px; /* Ajuste conforme necessário */
+  right: 0; /* Alinha a imagem à direita do contêiner */
+}
 .tituloFisioterapia {
-  position: relative; /* Define o contexto para o posicionamento relativo */
-  left: 50px; /* Ajuste este valor conforme necessário */
+  left: 400px; /* Aumenta o espaço à esquerda */ /* Ajusta o espaço acima, se necessário */
+  /* Você pode usar margin-right para mover à direita */
 }
 
 .navbar-brand {

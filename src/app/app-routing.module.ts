@@ -7,8 +7,7 @@ import { NovopacienteComponent } from './novopaciente/novopaciente.component';
 const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'pacientes', component: PacientesComponent },
-  { path: 'novopaciente', component: NovopacienteComponent }, // Para cadastro de novo paciente
-  { path: 'editar-paciente/:id', component: NovopacienteComponent }, // Alterando para editar paciente existente
+  { path: 'novopaciente', component: NovopacienteComponent },
 ];
 
 @NgModule({

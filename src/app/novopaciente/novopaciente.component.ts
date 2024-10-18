@@ -10,9 +10,6 @@ import { PacienteService } from '../services/paciente.service';
 })
 export class NovopacienteComponent implements OnInit {
   form: FormGroup;
-  pacienteId: number | null = null;
-  titulo: string = 'NOVO PACIENTE'; // Adicionando a propriedade título
-  editar: boolean = false; // Adicionando a propriedade editar
 
   constructor(
     private pacienteService: PacienteService,
@@ -51,85 +48,47 @@ export class NovopacienteComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.route.params.subscribe((params) => {
-      this.pacienteId = +params['id'];
-      if (this.pacienteId) {
-        this.carregarPaciente(this.pacienteId);
-        this.titulo = 'EDITAR PACIENTE'; // Atualiza o título para 'EDITAR PACIENTE'
-        this.editar = true;
-      }
-    });
-  }
-
   salvar() {
     if (this.form.valid) {
       const formValues = this.form.value;
 
-      const pacienteData = this.gerarPacienteData(formValues);
-
-      if (this.pacienteId) {
-        // Atualizar paciente existente
-        this.pacienteService
-          .atualizarPaciente(this.pacienteId, pacienteData)
-          .subscribe({
-            next: (response: any) => {
-              console.log('Paciente atualizado com sucesso', response);
-              this.router.navigate(['pacientes']);
-              this.salvarFichaAnamnese(response.id, formValues);
-            },
-            error: (error: any) => {
-              console.error('Erro ao atualizar paciente:', error);
-            },
-          });
-      } else {
-        // Criar novo paciente
-        this.pacienteService.salvarPaciente(pacienteData).subscribe({
-          next: (response: any) => {
-            console.log('Paciente salvo com sucesso!', response);
-            this.router.navigate(['pacientes']);
-            this.salvarFichaAnamnese(response.id, formValues);
-          },
-          error: (error: any) => {
-            console.error('Erro ao salvar paciente:', error);
-          },
-        });
-      }
+      this.salvarPaciente(formValues);
     } else {
       console.error('Formulário inválido');
     }
   }
 
   private salvarPaciente(formValues: any) {
-    console.log('Entrou aqui');
-    const pacienteData = this.gerarPacienteData(formValues);
+    const pacienteData = {
+      nome: formValues.nome,
+      dataAvaliacao: formValues.dataAvaliacao,
+      estadoCivil: formValues.estadoCivil,
+      nacionalidade: formValues.nacionalidade,
+      naturalidade: formValues.naturalidade,
+      dataNascimento: formValues.dataNascimento,
+      peso: formValues.peso,
+      altura: formValues.altura,
+      endereco: formValues.endereco,
+      numeroIdentidade: formValues.numeroIdentidade,
+      telefone: formValues.telefone,
+      email: formValues.email,
+      profissao: formValues.profissao,
+      diagnosticoClinico: formValues.diagnosticoClinico,
+    };
 
-    if (this.editar) {
-      console.log('Entrou aqui 2');
-      this.pacienteService
-        .atualizarPaciente(this.pacienteId ?? 0, pacienteData)
-        .subscribe({
-          next: (response: any) => {
-            console.log('Paciente atualizado com sucesso', response);
-            this.router.navigate(['pacientes']);
-            this.salvarFichaAnamnese(response.id, formValues);
-          },
-          error: (error: any) => {
-            console.error('Erro ao atualizar paciente:', error);
-          },
-        });
-    } else {
-      this.pacienteService.salvarPaciente(pacienteData).subscribe({
-        next: (response: any) => {
-          console.log('Paciente salvo com sucesso!', response);
-          this.router.navigate(['pacientes']);
-          this.salvarFichaAnamnese(response.id, formValues);
-        },
-        error: (error: any) => {
-          console.error('Erro ao salvar paciente:', error);
-        },
-      });
-    }
+    this.pacienteService.salvarPaciente(pacienteData).subscribe({
+      next: (response: any) => {
+        console.log('Paciente salvo com sucesso!', response);
+
+        // Após salvar o paciente, redirecionar para a lista de pacientes
+        this.router.navigate(['pacientes']); // Ajuste a rota conforme necessário
+
+        this.salvarFichaAnamnese(response.id, formValues);
+      },
+      error: (error: any) => {
+        console.error('Erro ao salvar paciente:', error);
+      },
+    });
   }
 
   private atualizarPaciente(formValues: any) {
@@ -143,7 +102,6 @@ export class NovopacienteComponent implements OnInit {
     this.pacienteService.getPacientePorId(this.pacienteId).subscribe({
       next: (paciente: any) => {
         if (paciente) {
-          console.log(paciente);
           // Cria um objeto para atualizar apenas os campos que foram preenchidos
           const pacienteAtualizado = {
             ...paciente, // Mantém os dados existentes
@@ -176,14 +134,12 @@ export class NovopacienteComponent implements OnInit {
     return {
       nome: formValues.nome || undefined,
       dataAvaliacao: formValues.dataAvaliacao
-        ? this.formatarData(new Date(formValues.dataAvaliacao)) // Garante que estamos passando um Date válido
+        ? this.formatarData(formValues.dataAvaliacao)
         : undefined,
       estadoCivil: formValues.estadoCivil || undefined,
       nacionalidade: formValues.nacionalidade || undefined,
       naturalidade: formValues.naturalidade || undefined,
-      dataNascimento: formValues.dataNascimento
-        ? this.formatarData(new Date(formValues.dataNascimento)) // Garante que estamos passando um Date válido
-        : null,
+      dataNascimento: this.formatarData(formValues.dataNascimento),
       peso: formValues.peso || undefined,
       altura: formValues.altura || undefined,
       endereco: formValues.endereco || undefined,
@@ -196,14 +152,13 @@ export class NovopacienteComponent implements OnInit {
   }
 
   private formatarData(data: Date | null): string | null {
-    if (data instanceof Date && !isNaN(data.getTime())) {
-      // Verifica se é um objeto Date válido
+    if (data) {
       const dia = String(data.getDate()).padStart(2, '0');
       const mes = String(data.getMonth() + 1).padStart(2, '0');
       const ano = data.getFullYear();
       return `${ano}-${mes}-${dia}`;
     }
-    return null; // Retorna null se data não for um objeto Date válido
+    return null;
   }
 
   private carregarPaciente(id: number) {
@@ -211,9 +166,6 @@ export class NovopacienteComponent implements OnInit {
       next: (paciente: any) => {
         console.log('Dados do paciente:', paciente);
         if (paciente) {
-          paciente.dataAvaliacao = paciente.dataAvaliacao.split('T')[0];
-          paciente.dataNascimento = paciente.dataNascimento.split('T')[0];
-
           this.form.patchValue(paciente);
           console.log('Formulário preenchido com sucesso:', this.form.value);
         } else {
